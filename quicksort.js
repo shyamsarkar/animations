@@ -1,5 +1,3 @@
-import './style.css'
-
 class QuicksortVisualizer {
   constructor() {
     this.array = [64, 34, 25, 12, 22, 11, 90, 88, 45, 50];
@@ -316,4 +314,4 @@ class QuicksortVisualizer {
   }
 }
 
-new QuicksortVisualizer();
+export default QuicksortVisualizer;

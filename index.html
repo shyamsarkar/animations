@@ -3,15 +3,16 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quicksort Visualizer</title>
+  <title>Sorting Visualizer</title>
+  <link rel="icon" href="./javascript_logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
   <div id="app">
     <div class="flex space-between">
-      <h1>Quicksort Visualizer</h1>
+      <h1>Sorting Visualizer</h1>
       <div class="input-section absolute right-0 top-4">
         <label for="arrayInput">Array:</label>
         <input type="text" id="arrayInput" placeholder="e.g., 64, 34, 25, 12, 22, 11, 90, 88, 45, 50" />
@@ -32,20 +33,18 @@
         Messages will appear here
       </div>
     </div>
-
-    <div class="controls">
-
-
-      <div class="action-section">
-        <button id="startSort" class="primary-btn">Start Sort</button>
-        <button id="prevStep" class="primary-btn" disabled>Previous Step</button>
-        <button id="nextStep" class="primary-btn" disabled>Next Step</button>
-        <button id="reset" class="secondary-btn">Reset</button>
-      </div>
-    </div>
   </div>
 
-  <script type="module" src="/quicksort.js"></script>
+  <nav class="bottom-nav" aria-label="Sorting controls">
+    <div class="action-section">
+      <button id="startSort" class="primary-btn">Start Sort</button>
+      <button id="prevStep" class="primary-btn" disabled>Previous Step</button>
+      <button id="nextStep" class="primary-btn" disabled>Next Step</button>
+      <button id="reset" class="secondary-btn">Reset</button>
+    </div>
+  </nav>
+
+  <script type="module" src="./index.js"></script>
 </body>
 
 </html>
