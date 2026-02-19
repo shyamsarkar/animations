@@ -1,50 +1,99 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Algorithm Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <header class="site-header">
+        <div class="header-inner">
+          <div class="logo-mark">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="6" fill="#3b82f6" />
+              <path d="M7 14h14M14 7l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span>AlgoVis</span>
+          </div>
+        </div>
+      </header>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sorting Visualizer</title>
-  <link rel="icon" href="./javascript_logo.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="./style.css" />
-</head>
+      <main class="main-content">
+        <div class="hero">
+          <h1 class="hero-title">Algorithm Visualizer</h1>
+          <p class="hero-sub">Step through classic algorithms interactively — one comparison at a time.</p>
+        </div>
 
-<body>
-  <div id="app">
-    <div class="flex space-between">
-      <h1>Sorting Visualizer</h1>
-      <div class="input-section absolute right-0 top-4">
-        <label for="arrayInput">Array:</label>
-        <input type="text" id="arrayInput" placeholder="e.g., 64, 34, 25, 12, 22, 11, 90, 88, 45, 50" />
-        <button id="setArray">Set Array</button>
-      </div>
+        <div class="task-grid">
+          <a href="min-heap.html" class="task-card">
+            <div class="task-card-header">
+              <div class="task-icon task-icon--active">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <circle cx="11" cy="4" r="3" fill="currentColor" />
+                  <circle cx="5" cy="15" r="3" fill="currentColor" />
+                  <circle cx="17" cy="15" r="3" fill="currentColor" />
+                  <line x1="11" y1="7" x2="5" y2="12" stroke="currentColor" stroke-width="1.5" />
+                  <line x1="11" y1="7" x2="17" y2="12" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+              </div>
+              <span class="task-badge task-badge--available">Available</span>
+            </div>
+            <h2 class="task-name">Min Heap</h2>
+            <p class="task-desc">Visualize how an unordered array is transformed into a min-heap using bottom-up heapify.</p>
+            <div class="task-footer">
+              <span class="task-cta">Explore →</span>
+            </div>
+          </a>
+
+          <div class="task-card task-card--disabled">
+            <div class="task-card-header">
+              <div class="task-icon task-icon--muted">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <circle cx="11" cy="18" r="3" fill="currentColor" />
+                  <circle cx="5" cy="7" r="3" fill="currentColor" />
+                  <circle cx="17" cy="7" r="3" fill="currentColor" />
+                  <line x1="11" y1="15" x2="5" y2="10" stroke="currentColor" stroke-width="1.5" />
+                  <line x1="11" y1="15" x2="17" y2="10" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+              </div>
+              <span class="task-badge task-badge--soon">Coming Soon</span>
+            </div>
+            <h2 class="task-name">Max Heap</h2>
+            <p class="task-desc">See the heapify process in reverse — building a max-heap where parents are always greater.</p>
+            <div class="task-footer">
+              <span class="task-cta task-cta--muted">Coming Soon</span>
+            </div>
+          </div>
+
+          <div class="task-card task-card--disabled">
+            <div class="task-card-header">
+              <div class="task-icon task-icon--muted">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="3" y1="11" x2="13" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="3" y1="16" x2="8" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                  <polyline points="16,14 19,17 16,20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <span class="task-badge task-badge--soon">Coming Soon</span>
+            </div>
+            <h2 class="task-name">QuickSort</h2>
+            <p class="task-desc">Watch the divide-and-conquer partitioning strategy of quicksort unfold in real time.</p>
+            <div class="task-footer">
+              <span class="task-cta task-cta--muted">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        <p>Built with vanilla JS · No frameworks</p>
+      </footer>
     </div>
-
-    <div id="arrayContainer" class="array-container"></div>
-
-    <div class="status-section flex gap-1">
-      <div class="pivot-section">
-        <label>Select Pivot:</label>
-        <button id="pivotFirst" class="pivot-btn active">First</button>
-        <button id="pivotMiddle" class="pivot-btn">Middle</button>
-        <button id="pivotLast" class="pivot-btn">Last</button>
-      </div>
-      <div id="statusMessage" class="status-message">
-        Messages will appear here
-      </div>
-    </div>
-  </div>
-
-  <nav class="bottom-nav" aria-label="Sorting controls">
-    <div class="action-section">
-      <button id="startSort" class="primary-btn">Start Sort</button>
-      <button id="prevStep" class="primary-btn" disabled>Previous Step</button>
-      <button id="nextStep" class="primary-btn" disabled>Next Step</button>
-      <button id="reset" class="secondary-btn">Reset</button>
-    </div>
-  </nav>
-
-  <script type="module" src="./index.js"></script>
-</body>
-
+  </body>
 </html>

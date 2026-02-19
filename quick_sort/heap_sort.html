@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heap Visualizer - Min & Max Heap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .heap-selector {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .heap-btn {
+            flex: 1;
+            background: #e0e7ff;
+            color: #4c1d95;
+        }
+
+        .heap-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .action-btn:hover {
+            background: #059669;
+        }
+
+        .danger-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .danger-btn:hover {
+            background: #dc2626;
+        }
+
+        .step-btn {
+            background: #f59e0b;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .step-btn:hover {
+            background: #d97706;
+        }
+
+        .step-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        input[type="number"] {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .visualization {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 500px;
+            position: relative;
+        }
+
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .status.animating {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: auto;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .node {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: white;
+            transition: all 0.5s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .node.min-heap {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .node.max-heap {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .node.highlight {
+            animation: pulse 0.5s ease-in-out;
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eff6ff;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+        }
+
+        .info-box h3 {
+            color: #4c1d95;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Heap Visualizer</h1>
+            <p>Interactive Min & Max Heap with Step-by-Step Animation</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <div class="heap-selector">
+                    <button class="heap-btn active" id="minHeapBtn">Min Heap</button>
+                    <button class="heap-btn" id="maxHeapBtn">Max Heap</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <input type="number" id="valueInput" placeholder="Value" value="10">
+                <button class="action-btn" id="insertBtn">Insert</button>
+                <button class="danger-btn" id="extractBtn">Extract Root</button>
+                <button class="danger-btn" id="clearBtn">Clear All</button>
+            </div>
+
+            <div class="control-group">
+                <button class="step-btn" id="nextStepBtn" disabled>Next Step</button>
+            </div>
+
+            <div class="status" id="status">Ready to visualize heap operations</div>
+        </div>
+
+        <div class="visualization">
+            <div id="canvas-container"></div>
+
+            <div class="info-box">
+                <h3 id="heapType">Min Heap</h3>
+                <p id="heapDescription">
+                    In a Min Heap, the parent node is always smaller than its children. The smallest element is at the root.
+                    Click "Insert" to add values, "Extract Root" to remove the minimum, and use "Next Step" to animate operations.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class HeapVisualizer {
+            constructor() {
+                this.heap = [];
+                this.isMinHeap = true;
+                this.animationQueue = [];
+                this.isAnimating = false;
+                this.container = document.getElementById('canvas-container');
+                this.statusEl = document.getElementById('status');
+                this.nextStepBtn = document.getElementById('nextStepBtn');
+
+                this.setupEventListeners();
+                this.render();
+            }
+
+            setupEventListeners() {
+                document.getElementById('minHeapBtn').addEventListener('click', () => this.switchHeapType(true));
+                document.getElementById('maxHeapBtn').addEventListener('click', () => this.switchHeapType(false));
+                document.getElementById('insertBtn').addEventListener('click', () => this.insertValue());
+                document.getElementById('extractBtn').addEventListener('click', () => this.extractRoot());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clear());
+                document.getElementById('nextStepBtn').addEventListener('click', () => this.executeNextStep());
+
+                document.getElementById('valueInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.insertValue();
+                });
+            }
+
+            switchHeapType(isMin) {
+                if (this.isAnimating) return;
+
+                this.isMinHeap = isMin;
+                document.getElementById('minHeapBtn').classList.toggle('active', isMin);
+                document.getElementById('maxHeapBtn').classList.toggle('active', !isMin);
+
+                const heapType = document.getElementById('heapType');
+                const heapDesc = document.getElementById('heapDescription');
+
+                if (isMin) {
+                    heapType.textContent = 'Min Heap';
+                    heapDesc.textContent = 'In a Min Heap, the parent node is always smaller than its children. The smallest element is at the root. Click "Insert" to add values, "Extract Root" to remove the minimum, and use "Next Step" to animate operations.';
+                } else {
+                    heapType.textContent = 'Max Heap';
+                    heapDesc.textContent = 'In a Max Heap, the parent node is always larger than its children. The largest element is at the root. Click "Insert" to add values, "Extract Root" to remove the maximum, and use "Next Step" to animate operations.';
+                }
+
+                this.heap = [];
+                this.render();
+            }
+
+            insertValue() {
+                if (this.isAnimating) return;
+
+                const input = document.getElementById('valueInput');
+                const value = parseInt(input.value);
+
+                if (isNaN(value)) {
+                    alert('Please enter a valid number');
+                    return;
+                }
+
+                this.heap.push(value);
+                this.animationQueue = [];
+                this.bubbleUp(this.heap.length - 1);
+                this.startAnimation();
+
+                input.value = '';
+                input.focus();
+            }
+
+            extractRoot() {
+                if (this.isAnimating || this.heap.length === 0) return;
+
+                this.animationQueue = [];
+
+                if (this.heap.length === 1) {
+                    this.heap = [];
+                    this.render();
+                    this.setStatus('Root extracted. Heap is now empty.');
+                    return;
+                }
+
+                this.heap[0] = this.heap.pop();
+                this.bubbleDown(0);
+                this.startAnimation();
+            }
+
+            bubbleUp(index) {
+                if (index === 0) return;
+
+                const parentIndex = Math.floor((index - 1) / 2);
+                const shouldSwap = this.isMinHeap
+                    ? this.heap[index] < this.heap[parentIndex]
+                    : this.heap[index] > this.heap[parentIndex];
+
+                if (shouldSwap) {
+                    this.animationQueue.push({
+                        type: 'swap',
+                        indices: [index, parentIndex],
+                        message: `Comparing ${this.heap[index]} with parent ${this.heap[parentIndex]}, swapping...`
+                    });
+                    [this.heap[index], this.heap[parentIndex]] = [this.heap[parentIndex], this.heap[index]];
+                    this.bubbleUp(parentIndex);
+                } else {
+                    this.animationQueue.push({
+                        type: 'complete',
+                        indices: [index],
+                        message: 'Heap property satisfied!'
+                    });
+                }
+            }
+
+            bubbleDown(index) {
+                const leftChild = 2 * index + 1;
+                const rightChild = 2 * index + 2;
+                let targetIndex = index;
+
+                if (leftChild < this.heap.length) {
+                    const shouldSwapLeft = this.isMinHeap
+                        ? this.heap[leftChild] < this.heap[targetIndex]
+                        : this.heap[leftChild] > this.heap[targetIndex];
+
+                    if (shouldSwapLeft) targetIndex = leftChild;
+                }
+
+                if (rightChild < this.heap.length) {
+                    const shouldSwapRight = this.isMinHeap
+                        ? this.heap[rightChild] < this.heap[targetIndex]
+                        : this.heap[rightChild] > this.heap[targetIndex];
+
+                    if (shouldSwapRight) targetIndex = rightChild;
+                }
+
+                if (targetIndex !== index) {
+                    this.animationQueue.push({
+                        type: 'swap',
+                        indices: [index, targetIndex],
+                        message: `Swapping ${this.heap[index]} with ${this.heap[targetIndex]}...`
+                    });
+                    [this.heap[index], this.heap[targetIndex]] = [this.heap[targetIndex], this.heap[index]];
+                    this.bubbleDown(targetIndex);
+                } else {
+                    this.animationQueue.push({
+                        type: 'complete',
+                        indices: [index],
+                        message: 'Heap property satisfied!'
+                    });
+                }
+            }
+
+            startAnimation() {
+                if (this.animationQueue.length === 0) {
+                    this.render();
+                    return;
+                }
+
+                this.isAnimating = true;
+                this.nextStepBtn.disabled = false;
+                this.statusEl.classList.add('animating');
+                this.executeNextStep();
+            }
+
+            executeNextStep() {
+                if (this.animationQueue.length === 0) {
+                    this.isAnimating = false;
+                    this.nextStepBtn.disabled = true;
+                    this.statusEl.classList.remove('animating');
+                    this.setStatus('Animation complete!');
+                    return;
+                }
+
+                const step = this.animationQueue.shift();
+                this.setStatus(step.message);
+                this.render(step.indices);
+
+                if (this.animationQueue.length === 0) {
+                    setTimeout(() => {
+                        this.isAnimating = false;
+                        this.nextStepBtn.disabled = true;
+                        this.statusEl.classList.remove('animating');
+                        this.setStatus('Ready for next operation');
+                    }, 600);
+                }
+            }
+
+            setStatus(message) {
+                this.statusEl.textContent = message;
+            }
+
+            clear() {
+                if (this.isAnimating) return;
+                this.heap = [];
+                this.animationQueue = [];
+                this.render();
+                this.setStatus('Heap cleared. Ready for new operations.');
+            }
+
+            render(highlightIndices = []) {
+                this.container.innerHTML = '';
+
+                if (this.heap.length === 0) {
+                    this.container.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 50px;">Heap is empty. Add some values to visualize!</p>';
+                    return;
+                }
+
+                const levels = Math.ceil(Math.log2(this.heap.length + 1));
+                const nodeSize = 50;
+                const levelHeight = 100;
+                const containerWidth = Math.max(1000, Math.pow(2, levels - 1) * 80);
+
+                this.container.style.width = containerWidth + 'px';
+                this.container.style.height = (levels * levelHeight + 100) + 'px';
+
+                const canvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                canvas.setAttribute('width', containerWidth);
+                canvas.setAttribute('height', levels * levelHeight + 100);
+                canvas.style.position = 'absolute';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                this.container.appendChild(canvas);
+
+                this.heap.forEach((value, index) => {
+                    const level = Math.floor(Math.log2(index + 1));
+                    const positionInLevel = index - (Math.pow(2, level) - 1);
+                    const nodesInLevel = Math.pow(2, level);
+
+                    const x = (containerWidth / (nodesInLevel + 1)) * (positionInLevel + 1);
+                    const y = level * levelHeight + 50;
+
+                    if (index > 0) {
+                        const parentIndex = Math.floor((index - 1) / 2);
+                        const parentLevel = Math.floor(Math.log2(parentIndex + 1));
+                        const parentPosInLevel = parentIndex - (Math.pow(2, parentLevel) - 1);
+                        const parentNodesInLevel = Math.pow(2, parentLevel);
+                        const parentX = (containerWidth / (parentNodesInLevel + 1)) * (parentPosInLevel + 1);
+                        const parentY = parentLevel * levelHeight + 50;
+
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', parentX);
+                        line.setAttribute('y1', parentY);
+                        line.setAttribute('x2', x);
+                        line.setAttribute('y2', y);
+                        line.setAttribute('stroke', '#d1d5db');
+                        line.setAttribute('stroke-width', '2');
+                        canvas.appendChild(line);
+                    }
+
+                    const node = document.createElement('div');
+                    node.className = `node ${this.isMinHeap ? 'min-heap' : 'max-heap'}`;
+                    if (highlightIndices.includes(index)) {
+                        node.classList.add('highlight');
+                    }
+                    node.textContent = value;
+                    node.style.left = (x - nodeSize / 2) + 'px';
+                    node.style.top = (y - nodeSize / 2) + 'px';
+
+                    this.container.appendChild(node);
+                });
+            }
+        }
+
+        const visualizer = new HeapVisualizer();
+    </script>
+</body>
+</html>
