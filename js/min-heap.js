@@ -5,6 +5,7 @@ const SVG_PADDING_TOP = 40;
 
 let steps = [];
 let currentStep = 0;
+let currentHeap = [];
 
 function heapifyDown(arr, n, i, stepList) {
   const left = 2 * i + 1;
@@ -236,6 +237,8 @@ function parseInput(raw) {
 function initialize(arr) {
   steps = generateSteps(arr);
   currentStep = 0;
+  // keep track of the current heap state for interactive ops
+  currentHeap = steps.length ? [...steps[steps.length - 1].array] : [...arr];
   render();
 }
 
@@ -274,3 +277,160 @@ document.getElementById('array-input').addEventListener('keydown', (e) => {
 });
 
 initialize(DEFAULT_ARRAY);
+
+function bubbleUp(arr, index, stepList) {
+  if (index === 0) return;
+  const parentIndex = Math.floor((index - 1) / 2);
+
+  stepList.push({
+    array: [...arr],
+    highlighted: [index, parentIndex],
+    swapping: [],
+    type: 'compare',
+    message: `Comparing ${arr[index]} with parent ${arr[parentIndex]}.`,
+  });
+
+  if (arr[index] < arr[parentIndex]) {
+    stepList.push({
+      array: [...arr],
+      highlighted: [index, parentIndex],
+      swapping: [index, parentIndex],
+      type: 'swap',
+      message: `Swapping ${arr[index]} with parent ${arr[parentIndex]}...`,
+    });
+
+    [arr[index], arr[parentIndex]] = [arr[parentIndex], arr[index]];
+
+    stepList.push({
+      array: [...arr],
+      highlighted: [index, parentIndex],
+      swapping: [],
+      type: 'swapped',
+      message: `Swapped: index ${parentIndex}=${arr[parentIndex]}, index ${index}=${arr[index]}.`,
+    });
+
+    bubbleUp(arr, parentIndex, stepList);
+  } else {
+    stepList.push({
+      array: [...arr],
+      highlighted: [index],
+      swapping: [],
+      type: 'no-swap',
+      message: `${arr[index]} is in correct position.`,
+    });
+  }
+}
+
+function insertValue() {
+  const input = document.getElementById('value-input');
+  const val = Number(input.value);
+  if (isNaN(val)) {
+    document.getElementById('message-text').textContent = 'Please enter a valid number to insert.';
+    return;
+  }
+
+  const arr = [...currentHeap];
+  const stepList = [];
+
+  stepList.push({
+    array: [...arr, val],
+    highlighted: [],
+    swapping: [],
+    type: 'initial',
+    message: `Inserting ${val} at the end of the array.`,
+  });
+
+  arr.push(val);
+  bubbleUp(arr, arr.length - 1, stepList);
+
+  stepList.push({
+    array: [...arr],
+    highlighted: [],
+    swapping: [],
+    type: 'complete',
+    message: `Insert complete.`,
+  });
+
+  steps = stepList;
+  currentStep = 0;
+  currentHeap = [...arr];
+  render();
+  input.value = '';
+  input.focus();
+}
+
+function extractRoot() {
+  const arr = [...currentHeap];
+  const stepList = [];
+
+  if (arr.length === 0) {
+    document.getElementById('message-text').textContent = 'Heap is already empty.';
+    return;
+  }
+
+  if (arr.length === 1) {
+    stepList.push({
+      array: [...arr],
+      highlighted: [0],
+      swapping: [],
+      type: 'compare',
+      message: `Extracting root: ${arr[0]}. Heap will become empty.`,
+    });
+
+    arr.pop();
+
+    stepList.push({
+      array: [...arr],
+      highlighted: [],
+      swapping: [],
+      type: 'complete',
+      message: 'Heap is now empty.',
+    });
+
+    steps = stepList;
+    currentStep = 0;
+    currentHeap = [];
+    render();
+    return;
+  }
+
+  stepList.push({
+    array: [...arr],
+    highlighted: [0],
+    swapping: [],
+    type: 'compare',
+    message: `Extracting root: ${arr[0]}. Moving last element to root.`,
+  });
+
+  arr[0] = arr.pop();
+  heapifyDown(arr, arr.length, 0, stepList);
+
+  stepList.push({
+    array: [...arr],
+    highlighted: [],
+    swapping: [],
+    type: 'complete',
+    message: `Extract complete. New root is ${arr[0]}.`,
+  });
+
+  steps = stepList;
+  currentStep = 0;
+  currentHeap = [...arr];
+  render();
+}
+
+function clearHeap() {
+  if (currentHeap.length === 0) {
+    document.getElementById('message-text').textContent = 'Heap is already empty.';
+    return;
+  }
+  steps = [{ array: [], highlighted: [], swapping: [], type: 'complete', message: 'Heap cleared.' }];
+  currentHeap = [];
+  currentStep = 0;
+  render();
+}
+
+// wire up the new buttons
+document.getElementById('btn-insert').addEventListener('click', insertValue);
+document.getElementById('btn-extract').addEventListener('click', extractRoot);
+document.getElementById('btn-clear').addEventListener('click', clearHeap);

@@ -85,6 +85,7 @@
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 28px;
+  flex-direction: row;
 }
 
 .mh-input-label {
@@ -458,4 +459,12 @@
 .legend-dot--complete {
   background: rgba(16, 185, 129, 0.15);
   border: 2px solid var(--success);
+}
+
+/* Ensure the input section lays out in a row on wider screens.
+   This is more specific than the generic .mh-input-section rule in style.css. */
+@media (min-width: 800px) {
+  .mh-layout .mh-input-section {
+    flex-direction: row;
+  }
 }
