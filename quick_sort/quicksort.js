@@ -12,33 +12,42 @@ class QuicksortVisualizer {
   }
 
   initializeElements() {
-    this.arrayInput = document.getElementById('arrayInput');
-    this.setArrayBtn = document.getElementById('setArray');
-    this.pivotFirstBtn = document.getElementById('pivotFirst');
-    this.pivotLastBtn = document.getElementById('pivotLast');
-    this.pivotMiddleBtn = document.getElementById('pivotMiddle');
-    this.startSortBtn = document.getElementById('startSort');
-    this.prevStepBtn = document.getElementById('prevStep');
-    this.nextStepBtn = document.getElementById('nextStep');
-    this.resetBtn = document.getElementById('reset');
-    this.arrayContainer = document.getElementById('arrayContainer');
-    this.statusMessage = document.getElementById('statusMessage');
+    this.arrayInput = document.getElementById('array-input');
+    this.setArrayBtn = document.getElementById('btn-visualize');
+    this.pivotFirstBtn = document.getElementById('pivot-first');
+    this.pivotLastBtn = document.getElementById('pivot-last');
+    this.pivotMiddleBtn = document.getElementById('pivot-middle');
+    this.prevStepBtn = document.getElementById('btn-prev');
+    this.nextStepBtn = document.getElementById('btn-next');
+    this.arrayContainer = document.getElementById('array-container');
+    this.statusMessage = document.getElementById('message-text');
+    this.stepCounter = document.getElementById('step-counter');
+    this.progressBar = document.getElementById('progress-bar');
 
     this.arrayInput.value = this.array.join(', ');
   }
 
   attachEventListeners() {
-    this.setArrayBtn.addEventListener('click', () => this.handleSetArray());
+    this.setArrayBtn.addEventListener('click', () => this.handleStartSort());
     this.pivotFirstBtn.addEventListener('click', () => this.handlePivotSelection('first'));
     this.pivotLastBtn.addEventListener('click', () => this.handlePivotSelection('last'));
     this.pivotMiddleBtn.addEventListener('click', () => this.handlePivotSelection('middle'));
-    this.startSortBtn.addEventListener('click', () => this.handleStartSort());
     this.prevStepBtn.addEventListener('click', () => this.handlePreviousStep());
     this.nextStepBtn.addEventListener('click', () => this.handleNextStep());
-    this.resetBtn.addEventListener('click', () => this.handleReset());
   }
 
-  handleSetArray() {
+  handlePivotSelection(strategy) {
+    this.pivotStrategy = strategy;
+
+    document.querySelectorAll('.mh-btn-group-item').forEach(btn => btn.classList.remove('active'));
+    if (strategy === 'first') this.pivotFirstBtn.classList.add('active');
+    else if (strategy === 'last') this.pivotLastBtn.classList.add('active');
+    else if (strategy === 'middle') this.pivotMiddleBtn.classList.add('active');
+
+    this.showStatus(`Pivot strategy set to: ${strategy}`);
+  }
+
+  handleStartSort() {
     const input = this.arrayInput.value.trim();
     const numbers = input.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
 
@@ -48,34 +57,18 @@ class QuicksortVisualizer {
     }
 
     this.array = numbers;
-    this.renderArray();
-    this.showStatus('Array set successfully!');
-  }
-
-  handlePivotSelection(strategy) {
-    this.pivotStrategy = strategy;
-
-    document.querySelectorAll('.pivot-btn').forEach(btn => btn.classList.remove('active'));
-    if (strategy === 'first') this.pivotFirstBtn.classList.add('active');
-    else if (strategy === 'last') this.pivotLastBtn.classList.add('active');
-    else if (strategy === 'middle') this.pivotMiddleBtn.classList.add('active');
-
-    this.showStatus(`Pivot strategy set to: ${strategy}`);
-  }
-
-  handleStartSort() {
     this.sortSteps = [];
     this.currentStep = 0;
     this.isSorting = true;
 
     this.generateSortSteps([...this.array]);
 
-    this.startSortBtn.disabled = true;
+    this.setArrayBtn.disabled = true;
     this.prevStepBtn.disabled = true;
     this.nextStepBtn.disabled = false;
-    this.setArrayBtn.disabled = true;
 
-    this.showStatus('Sorting started! Click "Next Step" to proceed.');
+    this.showStatus('Sorting started! Click "Next" to proceed.');
+    this.updateStepCounter();
   }
 
   handleNextStep() {
@@ -91,6 +84,7 @@ class QuicksortVisualizer {
     this.currentStep++;
 
     this.prevStepBtn.disabled = this.currentStep <= 1;
+    this.updateStepCounter();
     if (this.currentStep >= this.sortSteps.length) {
       this.nextStepBtn.disabled = true;
     }
@@ -107,24 +101,17 @@ class QuicksortVisualizer {
 
     this.prevStepBtn.disabled = this.currentStep <= 1;
     this.nextStepBtn.disabled = false;
+    this.updateStepCounter();
   }
 
-  handleReset() {
-    this.sortSteps = [];
-    this.currentStep = 0;
-    this.isSorting = false;
-
-    const input = this.arrayInput.value.trim();
-    const numbers = input.split(',').map(num => parseInt(num.trim())).filter(num => !isNaN(num));
-    this.array = numbers.length > 0 ? numbers : [64, 34, 25, 12, 22, 11, 90, 88, 45, 50];
-
-    this.startSortBtn.disabled = false;
-    this.prevStepBtn.disabled = true;
-    this.nextStepBtn.disabled = true;
-    this.setArrayBtn.disabled = false;
-
-    this.renderArray();
-    this.showStatus('Reset complete. Ready to sort!');
+  updateStepCounter() {
+    const total = this.sortSteps.length;
+    this.stepCounter.textContent = `Step ${this.currentStep} / ${total}`;
+    
+    if (total > 0) {
+      const progress = (this.currentStep / total) * 100;
+      this.progressBar.style.width = `${progress}%`;
+    }
   }
 
   generateSortSteps(arr) {

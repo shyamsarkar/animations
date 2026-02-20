@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Max Heap Visualizer · AlgoVis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/min-heap.css" />
+    <style>
+        .mh-input-section {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+        }
+
+        .mh-input {
+            flex: 0 1 auto;
+        }
+
+        .mh-vis-area {
+            grid-template-columns: 1fr 1fr;
+        }
+    </style>
+</head>
+<body>
+    <div class="mh-layout">
+        <header class="mh-header">
+            <div class="mh-header-inner">
+                <a href="../index.html" class="btn-back">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Back
+                </a>
+                <span class="mh-header-title">Max Heap Visualizer</span>
+            </div>
+        </header>
+
+        <main class="mh-main">
+            <h1 class="mh-page-title">Max Heap</h1>
+            <p class="mh-page-sub">Interactive max-heap visualization — insert elements and watch it maintain heap property.</p>
+
+            <div class="mh-input-section">
+                <span class="mh-input-label">Value</span>
+                <input type="number" id="valueInput" class="mh-input" placeholder="Enter a number" value="10" />
+                <button class="btn-primary" id="insertBtn">Insert</button>
+                <button class="btn-primary" id="extractBtn">Extract Root</button>
+                <button class="btn-primary" id="clearBtn">Clear All</button>
+            </div>
+
+            <div class="mh-vis-area">
+                <div class="mh-panel">
+                    <div class="mh-panel-title">Tree View</div>
+                    <div class="mh-tree-container" id="tree-container"></div>
+                </div>
+                <div class="mh-panel">
+                    <div class="mh-panel-title">Array View</div>
+                    <div class="mh-array-container" id="array-container"></div>
+                </div>
+            </div>
+
+            <div class="mh-controls">
+                <div class="mh-controls-row">
+                    <button class="btn-step" id="nextStepBtn" disabled>
+                        Next Step
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="mh-message-box">
+                    <div class="message-dot" id="message-dot"></div>
+                    <span id="status">Ready to visualize heap operations</span>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot legend-dot--default"></div>
+                        Normal
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-dot--compare"></div>
+                        Comparing
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-dot--swap"></div>
+                        Swapping
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot legend-dot--complete"></div>
+                        Complete
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const NODE_RADIUS = 22;
+        const LEVEL_HEIGHT = 80;
+        const SVG_PADDING_TOP = 40;
+
+        class MaxHeapVisualizer {
+            constructor() {
+                this.heap = [];
+                this.animationQueue = [];
+                this.isAnimating = false;
+                this.currentStep = 0;
+                this.treeContainer = document.getElementById('tree-container');
+                this.arrayContainer = document.getElementById('array-container');
+                this.statusEl = document.getElementById('status');
+                this.nextStepBtn = document.getElementById('nextStepBtn');
+                this.messageDot = document.getElementById('message-dot');
+
+                this.setupEventListeners();
+                this.render();
+            }
+
+            setupEventListeners() {
+                document.getElementById('insertBtn').addEventListener('click', () => this.insertValue());
+                document.getElementById('extractBtn').addEventListener('click', () => this.extractRoot());
+                document.getElementById('clearBtn').addEventListener('click', () => this.clear());
+                document.getElementById('nextStepBtn').addEventListener('click', () => this.executeNextStep());
+
+                document.getElementById('valueInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.insertValue();
+                });
+            }
+
+            insertValue() {
+                if (this.isAnimating) return;
+
+                const input = document.getElementById('valueInput');
+                const value = parseInt(input.value);
+
+                if (isNaN(value)) {
+                    this.setStatus('Please enter a valid number');
+                    return;
+                }
+
+                this.heap.push(value);
+                this.animationQueue = [];
+                this.bubbleUp(this.heap.length - 1);
+                this.startAnimation();
+
+                input.value = '';
+                input.focus();
+            }
+
+            extractRoot() {
+                if (this.isAnimating || this.heap.length === 0) return;
+
+                this.animationQueue = [];
+
+                if (this.heap.length === 1) {
+                    this.animationQueue.push({
+                        array: [],
+                        highlighted: [],
+                        swapping: [],
+                        type: 'complete',
+                        message: 'Root extracted. Heap is now empty.'
+                    });
+                    this.heap = [];
+                    this.startAnimation();
+                    return;
+                }
+
+                this.animationQueue.push({
+                    array: [...this.heap],
+                    highlighted: [0],
+                    swapping: [],
+                    type: 'compare',
+                    message: `Extracting root: ${this.heap[0]}. Moving last element to root.`
+                });
+
+                this.heap[0] = this.heap.pop();
+                this.bubbleDown(0);
+                this.startAnimation();
+            }
+
+            bubbleUp(index) {
+                if (index === 0) return;
+
+                const parentIndex = Math.floor((index - 1) / 2);
+                const shouldSwap = this.heap[index] > this.heap[parentIndex];
+
+                if (shouldSwap) {
+                    this.animationQueue.push({
+                        array: [...this.heap],
+                        highlighted: [index, parentIndex],
+                        swapping: [],
+                        type: 'compare',
+                        message: `Comparing ${this.heap[index]} with parent ${this.heap[parentIndex]}. Child is larger, will swap.`
+                    });
+
+                    this.animationQueue.push({
+                        array: [...this.heap],
+                        highlighted: [index, parentIndex],
+                        swapping: [index, parentIndex],
+                        type: 'swap',
+                        message: `Swapping ${this.heap[index]} and ${this.heap[parentIndex]}...`
+                    });
+
+                    [this.heap[index], this.heap[parentIndex]] = [this.heap[parentIndex], this.heap[index]];
+
+                    this.bubbleUp(parentIndex);
+                } else {
+                    this.animationQueue.push({
+                        array: [...this.heap],
+                        highlighted: [index],
+                        swapping: [],
+                        type: 'no-swap',
+                        message: `No swap needed. ${this.heap[index]} is in correct position.`
+                    });
+                }
+            }
+
+            bubbleDown(index) {
+                const leftChild = 2 * index + 1;
+                const rightChild = 2 * index + 2;
+                let targetIndex = index;
+
+                if (leftChild < this.heap.length) {
+                    const compareNodes = [index, leftChild];
+                    if (rightChild < this.heap.length) compareNodes.push(rightChild);
+
+                    this.animationQueue.push({
+                        array: [...this.heap],
+                        highlighted: compareNodes,
+                        swapping: [],
+                        type: 'compare',
+                        message: `Comparing ${this.heap[index]} with children.`
+                    });
+
+                    if (this.heap[leftChild] > this.heap[targetIndex]) {
+                        targetIndex = leftChild;
+                    }
+
+                    if (rightChild < this.heap.length && this.heap[rightChild] > this.heap[targetIndex]) {
+                        targetIndex = rightChild;
+                    }
+
+                    if (targetIndex !== index) {
+                        this.animationQueue.push({
+                            array: [...this.heap],
+                            highlighted: [index, targetIndex],
+                            swapping: [index, targetIndex],
+                            type: 'swap',
+                            message: `Swapping ${this.heap[index]} with ${this.heap[targetIndex]}...`
+                        });
+
+                        [this.heap[index], this.heap[targetIndex]] = [this.heap[targetIndex], this.heap[index]];
+                        this.bubbleDown(targetIndex);
+                    } else {
+                        this.animationQueue.push({
+                            array: [...this.heap],
+                            highlighted: [index],
+                            swapping: [],
+                            type: 'no-swap',
+                            message: 'Heap property satisfied!'
+                        });
+                    }
+                } else {
+                    this.animationQueue.push({
+                        array: [...this.heap],
+                        highlighted: [index],
+                        swapping: [],
+                        type: 'no-swap',
+                        message: 'Heap property satisfied!'
+                    });
+                }
+            }
+
+            startAnimation() {
+                if (this.animationQueue.length === 0) {
+                    this.render();
+                    return;
+                }
+
+                this.isAnimating = true;
+                this.nextStepBtn.disabled = false;
+                this.executeNextStep();
+            }
+
+            executeNextStep() {
+                if (this.animationQueue.length === 0) {
+                    this.isAnimating = false;
+                    this.nextStepBtn.disabled = true;
+                    this.setStatus('Animation complete! Ready for next operation.');
+                    this.updateMessageDot('complete');
+                    this.render();
+                    return;
+                }
+
+                const step = this.animationQueue.shift();
+                this.setStatus(step.message);
+                this.updateMessageDot(step.type);
+                this.render(step.array || this.heap, step.highlighted || [], step.swapping || [], step.type);
+            }
+
+            updateMessageDot(type) {
+                this.messageDot.className = 'message-dot';
+                if (type === 'compare') this.messageDot.classList.add('message-dot--compare');
+                else if (type === 'swap') this.messageDot.classList.add('message-dot--swap');
+                else if (type === 'complete') this.messageDot.classList.add('message-dot--complete');
+            }
+
+            setStatus(message) {
+                this.statusEl.textContent = message;
+            }
+
+            clear() {
+                if (this.isAnimating) return;
+                this.heap = [];
+                this.animationQueue = [];
+                this.render();
+                this.setStatus('Heap cleared. Ready for new operations.');
+            }
+
+            getNodePosition(index, n, svgWidth) {
+                const maxDepth = Math.floor(Math.log2(n));
+                const level = Math.floor(Math.log2(index + 1));
+                const levelStart = Math.pow(2, level) - 1;
+                const posInLevel = index - levelStart;
+                const bottomSlots = Math.pow(2, maxDepth);
+                const slotWidth = svgWidth / (bottomSlots + 1);
+                const slotsPerNode = Math.pow(2, maxDepth - level);
+                const x = (posInLevel * slotsPerNode + slotsPerNode / 2) * slotWidth + slotWidth / 2;
+                const y = level * LEVEL_HEIGHT + SVG_PADDING_TOP;
+                return { x, y };
+            }
+
+            getNodeClass(index, highlighted, swapping, type) {
+                if (swapping.includes(index)) return 'node-circle--swap';
+                if (highlighted.includes(index)) return 'node-circle--highlight';
+                if (type === 'complete') return 'node-circle--complete';
+                return '';
+            }
+
+            getEdgeClass(parentIdx, childIdx, highlighted, swapping) {
+                if (swapping.includes(parentIdx) && swapping.includes(childIdx)) return 'tree-edge--swap';
+                if (highlighted.includes(parentIdx) && highlighted.includes(childIdx)) return 'tree-edge--highlight';
+                return '';
+            }
+
+            renderTree(array, highlighted, swapping, type) {
+                const n = array.length;
+                if (n === 0) {
+                    return '<p style="text-align: center; color: var(--text-muted); padding: 50px;">Heap is empty</p>';
+                }
+
+                const maxDepth = Math.floor(Math.log2(n));
+                const svgWidth = 520;
+                const svgHeight = (maxDepth + 1) * LEVEL_HEIGHT + SVG_PADDING_TOP + 30;
+
+                let edges = '';
+                let nodes = '';
+
+                for (let i = 0; i < n; i++) {
+                    const pos = this.getNodePosition(i, n, svgWidth);
+                    const left = 2 * i + 1;
+                    const right = 2 * i + 2;
+
+                    if (left < n) {
+                        const lPos = this.getNodePosition(left, n, svgWidth);
+                        const edgeClass = this.getEdgeClass(i, left, highlighted, swapping);
+                        edges += `<line class="tree-edge ${edgeClass}" x1="${pos.x.toFixed(1)}" y1="${pos.y}" x2="${lPos.x.toFixed(1)}" y2="${lPos.y}" />`;
+                    }
+                    if (right < n) {
+                        const rPos = this.getNodePosition(right, n, svgWidth);
+                        const edgeClass = this.getEdgeClass(i, right, highlighted, swapping);
+                        edges += `<line class="tree-edge ${edgeClass}" x1="${pos.x.toFixed(1)}" y1="${pos.y}" x2="${rPos.x.toFixed(1)}" y2="${rPos.y}" />`;
+                    }
+                }
+
+                for (let i = 0; i < n; i++) {
+                    const pos = this.getNodePosition(i, n, svgWidth);
+                    const nodeClass = this.getNodeClass(i, highlighted, swapping, type);
+                    nodes += `
+                        <g>
+                            <circle class="node-circle ${nodeClass}" cx="${pos.x.toFixed(1)}" cy="${pos.y}" r="${NODE_RADIUS}" />
+                            <text class="node-text" x="${pos.x.toFixed(1)}" y="${pos.y}">${array[i]}</text>
+                            <text class="node-index" x="${pos.x.toFixed(1)}" y="${pos.y + NODE_RADIUS + 12}">${i}</text>
+                        </g>`;
+                }
+
+                return `<svg class="mh-tree-svg" viewBox="0 0 ${svgWidth} ${svgHeight}" xmlns="http://www.w3.org/2000/svg">
+                    ${edges}
+                    ${nodes}
+                </svg>`;
+            }
+
+            renderArray(array, highlighted, swapping, type) {
+                if (array.length === 0) {
+                    return '<p style="text-align: center; color: var(--text-muted); padding: 50px;">Heap is empty</p>';
+                }
+
+                const cells = array.map((val, i) => {
+                    let cls = '';
+                    if (swapping.includes(i)) cls = 'arr-cell-value--swap';
+                    else if (highlighted.includes(i)) cls = 'arr-cell-value--highlight';
+                    else if (type === 'complete') cls = 'arr-cell-value--complete';
+
+                    return `
+                        <div class="arr-cell">
+                            <div class="arr-cell-value ${cls}">${val}</div>
+                            <span class="arr-cell-index">${i}</span>
+                        </div>`;
+                }).join('');
+
+                return `
+                    <div class="arr-row">
+                        <span class="arr-label">Values</span>
+                        <div class="arr-cells">${cells}</div>
+                    </div>`;
+            }
+
+            render(array = this.heap, highlighted = [], swapping = [], type = '') {
+                this.treeContainer.innerHTML = this.renderTree(array, highlighted, swapping, type);
+                this.arrayContainer.innerHTML = this.renderArray(array, highlighted, swapping, type);
+            }
+        }
+
+        const visualizer = new MaxHeapVisualizer();
+    </script>
+
+    <footer style="text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 13px;">
+      <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+        <span>Built with vanilla JS</span>
+        <img src="../javascript.svg" alt="JavaScript" width="20" height="20" />
+      </div>
+    </footer>
+</body>
+</html>

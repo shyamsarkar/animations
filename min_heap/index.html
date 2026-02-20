@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QuickSort</title>
+    <title>Min Heap Visualizer · AlgoVis</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/min-heap.css" />
   </head>
   <body>
     <div class="mh-layout">
@@ -19,13 +20,13 @@
             </svg>
             Back
           </a>
-          <span class="mh-header-title">QuickSort Visualizer</span>
+          <span class="mh-header-title">Min Heap Visualizer</span>
         </div>
       </header>
 
       <main class="mh-main">
-        <h1 class="mh-page-title">QuickSort</h1>
-        <p class="mh-page-sub">Divide-and-conquer partitioning — watch quicksort partition and sort in real time.</p>
+        <h1 class="mh-page-title">Min Heap</h1>
+        <p class="mh-page-sub">Bottom-up heapify — transforms any array into a valid min-heap.</p>
 
         <div class="mh-input-section">
           <span class="mh-input-label">Array</span>
@@ -33,8 +34,8 @@
             type="text"
             id="array-input"
             class="mh-input"
-            value="64, 34, 25, 12, 22, 11, 90, 88, 45, 50"
-            placeholder="e.g. 64, 34, 25, 12, 22, 11, 90, 88, 45, 50"
+            value="9, 4, 7, 2, 6, 1"
+            placeholder="e.g. 9, 4, 7, 2, 6, 1"
             spellcheck="false"
           />
           <button class="btn-primary" id="btn-visualize">Visualize</button>
@@ -42,8 +43,12 @@
 
         <div class="mh-vis-area">
           <div class="mh-panel">
-            <div class="mh-panel-title">Array Visualization</div>
-            <div id="array-container" class="mh-array-container"></div>
+            <div class="mh-panel-title">Tree View</div>
+            <div class="mh-tree-container" id="tree-container"></div>
+          </div>
+          <div class="mh-panel">
+            <div class="mh-panel-title">Array View</div>
+            <div class="mh-array-container" id="array-container"></div>
           </div>
         </div>
 
@@ -66,16 +71,6 @@
               </svg>
             </button>
           </div>
-
-          <div class="mh-pivot-section">
-            <span class="mh-input-label">Pivot Strategy</span>
-            <div class="mh-btn-group">
-              <button class="mh-btn-group-item active" id="pivot-first" data-pivot="first">First</button>
-              <button class="mh-btn-group-item" id="pivot-middle" data-pivot="middle">Middle</button>
-              <button class="mh-btn-group-item" id="pivot-last" data-pivot="last">Last</button>
-            </div>
-          </div>
-
           <div class="mh-message-box">
             <div class="message-dot" id="message-dot"></div>
             <span id="message-text">Press "Visualize" to begin, or click Next to step through the default array.</span>
@@ -109,6 +104,6 @@
       </div>
     </footer>
 
-    <script type="module" src="./index.js"></script>
+    <script src="../js/min-heap.js"></script>
   </body>
 </html>
