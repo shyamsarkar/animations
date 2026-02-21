@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MergeSort</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="mh-layout">
+      <header class="mh-header">
+        <div class="mh-header-inner">
+          <a href="../index.html" class="btn-back">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Back
+          </a>
+          <span class="mh-header-title">MergeSort Visualizer</span>
+        </div>
+      </header>
+
+      <main class="mh-main">
+        <div class="mh-input-section">
+          <input
+            type="text"
+            id="array-input"
+            class="mh-input"
+            value="64, 34, 25, 12, 22, 11, 90, 88, 45, 50"
+            placeholder="e.g. 64, 34, 25, 12, 22, 11, 90, 88, 45, 50"
+            spellcheck="false"
+          />
+          <button class="btn-primary" id="btn-visualize">Visualize</button>
+        </div>
+
+        <div class="mh-vis-area">
+          <div class="mh-panel">
+            <div class="mh-panel-title">Array Visualization</div>
+            <div id="array-container" class="mh-array-container"></div>
+          </div>
+        </div>
+
+        <div class="mh-controls">
+          <div class="mh-controls-row">
+            <button class="btn-step" id="btn-prev" disabled>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              Previous
+            </button>
+            <div id="step-counter" class="step-counter">Step 0 / 0</div>
+            <button class="btn-step" id="btn-next" disabled>
+              Next
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="mh-footer">
+        <div id="message-text" class="mh-message">Ready to visualize MergeSort</div>
+      </footer>
+    </div>
+
+    <script type="module" src="./index.js"></script>
+  </body>
+</html>
