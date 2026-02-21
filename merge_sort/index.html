@@ -51,7 +51,10 @@
               </svg>
               Previous
             </button>
-            <div id="step-counter" class="step-counter">Step 0 / 0</div>
+            <div class="step-progress">
+              <div class="step-progress-bar" id="progress-bar" style="width: 0%"></div>
+            </div>
+            <span id="step-counter" class="step-counter">Step 0 / 0</span>
             <button class="btn-step" id="btn-next" disabled>
               Next
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -59,15 +62,12 @@
               </svg>
             </button>
           </div>
-          <div class="progress-container">
-            <div id="progress-bar" class="progress-bar"></div>
+          <div class="mh-message-box">
+            <div class="message-dot" id="message-dot"></div>
+            <span id="message-text">Ready to visualize MergeSort</span>
           </div>
         </div>
       </main>
-
-      <footer class="mh-footer">
-        <div id="message-text" class="mh-message">Ready to visualize MergeSort</div>
-      </footer>
     </div>
 
     <script type="module" src="./index.js"></script>
