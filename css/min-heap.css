@@ -114,6 +114,17 @@
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
+/* Hide browser spinner controls for insert number inputs */
+input[type='number'].mh-input {
+  -moz-appearance: textfield;
+}
+
+input[type='number'].mh-input::-webkit-outer-spin-button,
+input[type='number'].mh-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .btn-primary {
   background: var(--accent);
   color: #fff;

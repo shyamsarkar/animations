@@ -25,6 +25,8 @@ class QuicksortVisualizer {
     this.progressBar = document.getElementById('progress-bar');
 
     this.arrayInput.value = this.array.join(', ');
+    this.prevStepBtn.disabled = true;
+    this.nextStepBtn.disabled = true;
   }
 
   attachEventListeners() {
