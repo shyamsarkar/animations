@@ -263,7 +263,7 @@ class QuicksortVisualizer {
         bar.classList.add('comparing');
       }
 
-      if (swapping) {
+      if (swapping && (index === iIndex || index === jIndex)) {
         bar.classList.add('swapping');
       }
 
