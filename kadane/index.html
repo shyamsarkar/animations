@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kadane's Algorithm · AlgoVis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="mh-layout">
+      <header class="mh-header">
+        <div class="mh-header-inner">
+          <a href="../index.html" class="btn-back">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M9 11L5 7l4-4"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Back
+          </a>
+          <span class="mh-header-title">Kadane's Algorithm Visualizer</span>
+        </div>
+      </header>
+
+      <main class="mh-main kadane-main">
+        <section class="kadane-left">
+          <h1 class="mh-page-title">Kadane's Algorithm</h1>
+          <p class="mh-page-sub">Find the maximum sum of a contiguous subarray in linear time.</p>
+
+          <div class="mh-input-section">
+            <span class="mh-input-label">Array</span>
+            <input
+              type="text"
+              id="arrayInput"
+              class="mh-input"
+              placeholder="e.g. -2, 1, -3, 4, -1, 2, 1, -5, 4"
+              value="[-2, 1, -3, 4, -1, 2, 1, -5, 4]"
+              spellcheck="false"
+            />
+          </div>
+
+          <section class="mh-panel kadane-info">
+            <div class="mh-panel-title">How It Works</div>
+            <div class="kadane-info-body">
+              <p class="kadane-intro">
+                Kadane's algorithm efficiently finds the maximum sum of any contiguous subarray in a single pass through
+                the array.
+              </p>
+
+              <div class="kadane-insight">
+                <div class="kadane-insight-title">Key Insight</div>
+                <p class="kadane-insight-text">
+                  At each position, we decide: should we extend the current subarray, or start a new one? We start a
+                  new subarray if the current sum becomes negative, since adding a negative number would only decrease
+                  our total.
+                </p>
+              </div>
+
+              <div class="kadane-steps">
+                <h3>Algorithm Steps</h3>
+                <ol>
+                  <li>
+                    <span class="step-number">1</span>
+                    <span class="step-text">Initialize <code>current_sum</code> and <code>max_sum</code> to the first element.</span>
+                  </li>
+                  <li>
+                    <span class="step-number">2</span>
+                    <span class="step-text">For each element, add it to <code>current_sum</code>.</span>
+                  </li>
+                  <li>
+                    <span class="step-number">3</span>
+                    <span class="step-text">
+                      If <code>current_sum</code> becomes negative, start a new subarray from the current element.
+                    </span>
+                  </li>
+                  <li>
+                    <span class="step-number">4</span>
+                    <span class="step-text">Update <code>max_sum</code> whenever <code>current_sum</code> is larger.</span>
+                  </li>
+                </ol>
+              </div>
+
+              <div class="kadane-complexity">
+                <h3>Complexity</h3>
+                <p><strong>Time:</strong> O(n) — single pass through the array.</p>
+                <p><strong>Space:</strong> O(1) — only a few variables are tracked.</p>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="mh-vis-area">
+          <div class="mh-panel">
+            <div class="mh-panel-title">Visualization</div>
+
+            <div class="mh-array-container kadane-array-container" id="arrayDisplay"></div>
+
+            <div class="kadane-stats-grid">
+              <div class="kadane-stat-card">
+                <div class="kadane-stat-label">Current Index</div>
+                <div class="kadane-stat-value" id="currentIndex">0</div>
+              </div>
+              <div class="kadane-stat-card kadane-stat-card--blue">
+                <div class="kadane-stat-label">Current Sum</div>
+                <div class="kadane-stat-value" id="currentSum">0</div>
+              </div>
+              <div class="kadane-stat-card kadane-stat-card--green">
+                <div class="kadane-stat-label">Max Sum</div>
+                <div class="kadane-stat-value" id="maxSum">0</div>
+              </div>
+            </div>
+
+            <div class="kadane-explanation-box" id="explanation"></div>
+
+            <div class="kadane-controls">
+              <button class="btn-primary" id="playBtn">
+                <span id="playIcon">▶</span>
+                <span id="playText">Play</span>
+              </button>
+              <button class="btn-step kadane-btn-secondary" id="nextBtn">Step</button>
+              <button class="btn-step kadane-btn-secondary" id="resetBtn">Reset</button>
+
+              <div class="kadane-speed-control">
+                <span class="kadane-speed-label">Speed</span>
+                <select id="speedSelect" class="kadane-speed-select">
+                  <option value="1500">Slow</option>
+                  <option value="1000" selected>Normal</option>
+                  <option value="500">Fast</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="kadane-progress">
+              <span class="kadane-progress-text">
+                Step <span id="stepCount">1</span> of <span id="totalSteps">1</span>
+              </span>
+              <div class="kadane-progress-bar">
+                <div class="kadane-progress-fill" id="progressFill"></div>
+              </div>
+            </div>
+
+            <div class="kadane-result-box" id="resultBox">
+              <div class="kadane-result-label">Result</div>
+              <div class="kadane-result-text">
+                Maximum subarray sum is
+                <span class="kadane-result-highlight" id="resultSum">0</span><br />
+                Found in subarray from index <span id="resultStart">0</span> to <span id="resultEnd">0</span>:
+                <span class="kadane-result-array" id="resultArray">[0]</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
