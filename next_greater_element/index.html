@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Next Greater Element I · AlgoVis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="mh-layout">
+      <header class="mh-header">
+        <div class="mh-header-inner">
+          <a href="../index.html" class="btn-back">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M9 11L5 7l4-4"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Back
+          </a>
+          <span class="mh-header-title">Next Greater Element I Visualizer</span>
+        </div>
+      </header>
+
+      <main class="mh-main nge-main">
+        <section class="nge-left">
+          <h1 class="mh-page-title">Next Greater Element I</h1>
+          <p class="mh-page-sub">A monotonic decreasing stack walks nums2 once, building a next-greater map lookup.</p>
+
+          <div class="mh-input-section">
+            <div class="nge-input-group">
+              <div class="nge-field">
+                <span class="mh-input-label">nums1 (Lookup Array)</span>
+                <input
+                  type="text"
+                  id="nums1Input"
+                  class="mh-input"
+                  value="4, 1, 2"
+                  placeholder="e.g. 4, 1, 2"
+                  spellcheck="false"
+                />
+              </div>
+              <div class="nge-field" style="margin-top: 12px;">
+                <span class="mh-input-label">nums2 (Scan Array)</span>
+                <input
+                  type="text"
+                  id="nums2Input"
+                  class="mh-input"
+                  value="1, 3, 4, 2"
+                  placeholder="e.g. 1, 3, 4, 2"
+                  spellcheck="false"
+                />
+              </div>
+              <button class="btn-primary" id="applyBtn" style="margin-top: 14px; width: 100%;">Apply & Reset</button>
+              <div class="error" id="errorText"></div>
+            </div>
+          </div>
+
+          <section class="mh-panel nge-info" style="margin-top: 20px;">
+            <div class="mh-panel-title">How It Works</div>
+            <div class="nge-info-body">
+              <p class="nge-intro">
+                The algorithm scans <code>nums2</code> from left to right, maintaining elements in a
+                <strong>monotonic decreasing stack</strong> (top of the stack is always the smallest element).
+              </p>
+
+              <div class="nge-insight">
+                <div class="nge-insight-title">Key Concept: Monotonicity</div>
+                <p class="nge-insight-text">
+                  When we see a number larger than the stack's top element, it means we found the "next greater element"
+                  for that top element. We pop it from the stack, record the mapping in our hash map, and repeat until
+                  the stack is empty or the top is larger than the current number. Then, we push the current number.
+                </p>
+              </div>
+
+              <div class="nge-steps">
+                <h3>Algorithm Steps</h3>
+                <ol>
+                  <li>
+                    <span class="step-number">1</span>
+                    <span class="step-text"><strong>Scan nums2:</strong> Iterate through <code>nums2</code> from left to right.</span>
+                  </li>
+                  <li>
+                    <span class="step-number">2</span>
+                    <span class="step-text"><strong>Pop & Map:</strong> While stack is not empty and current element is greater than stack's top, pop the top and map <code>popped &rarr; current</code>.</span>
+                  </li>
+                  <li>
+                    <span class="step-number">3</span>
+                    <span class="step-text"><strong>Push:</strong> Push the current element onto the stack.</span>
+                  </li>
+                  <li>
+                    <span class="step-number">4</span>
+                    <span class="step-text"><strong>Lookup:</strong> For each element in <code>nums1</code>, retrieve its next greater value from the map (or -1 if not mapped).</span>
+                  </li>
+                </ol>
+              </div>
+
+              <div class="nge-complexity">
+                <h3>Complexity</h3>
+                <p><strong>Time:</strong> O(n + m) &mdash; each element is pushed and popped at most once.</p>
+                <p><strong>Space:</strong> O(n) &mdash; to store the stack and hash map mappings.</p>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="mh-vis-area">
+          <div class="mh-panel">
+            <div class="mh-panel-title">Visualization</div>
+
+            <div class="nge-label">nums2 (scanned to build the map)</div>
+            <div class="nge-array-row" id="nums2Row"></div>
+
+            <div class="nge-split">
+              <div>
+                <div class="nge-label">Monotonic Stack</div>
+                <div class="nge-stack-area" id="stackArea">
+                  <div class="nge-stack-floor">— empty —</div>
+                </div>
+              </div>
+              <div>
+                <div class="nge-label">Next-Greater Map</div>
+                <div class="nge-mapping-area" id="mapArea">
+                  <div class="nge-map-empty">nothing recorded yet</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="nge-label" style="margin-top: 22px;">nums1 (lookup source)</div>
+            <div class="nge-array-row" id="nums1Row"></div>
+
+            <div class="nge-label">Answer Array</div>
+            <div class="nge-array-row" id="answerRow"></div>
+
+            <div class="nge-controls">
+              <div class="nge-controls-row">
+                <button class="btn-primary" id="playBtn">
+                  <span id="playIcon">▶</span>
+                  <span id="playText">Play</span>
+                </button>
+                <button class="btn-step nge-btn-secondary" id="prevBtn">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path
+                      d="M9 11L5 7l4-4"
+                      stroke="currentColor"
+                      stroke-width="1.75"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  Prev
+                </button>
+                <button class="btn-step nge-btn-secondary" id="nextBtn">
+                  Next
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path
+                      d="M5 3l4 4-4 4"
+                      stroke="currentColor"
+                      stroke-width="1.75"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+
+                <div class="nge-speed-control">
+                  <span class="nge-speed-label">Speed</span>
+                  <select id="speedSelect" class="nge-speed-select">
+                    <option value="1600">Slow</option>
+                    <option value="1100" selected>Normal</option>
+                    <option value="600">Fast</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="nge-progress">
+                <span class="nge-progress-text">
+                  Step <span id="stepCount">0</span> of <span id="totalSteps">0</span>
+                </span>
+                <div class="nge-progress-bar">
+                  <div class="nge-progress-fill" id="progressFill"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="nge-explanation-box" id="explanation">
+              <strong>Current Step Explanation:</strong><br />
+              <span id="descText">Ready to start. Press "Play" or "Next" to begin.</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
