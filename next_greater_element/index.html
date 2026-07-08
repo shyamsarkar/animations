@@ -67,6 +67,57 @@
             </div>
           </div>
 
+          <div class="nge-controls" style="margin-top: 10px; border-top: none; padding-top: 0;">
+            <div class="nge-controls-row">
+              <button class="btn-primary" id="playBtn">
+                <span id="playIcon">▶</span>
+                <span id="playText">Play</span>
+              </button>
+              <button class="btn-step nge-btn-secondary" id="prevBtn" disabled>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M9 11L5 7l4-4"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                Previous
+              </button>
+              <button class="btn-step nge-btn-secondary" id="nextBtn">
+                Next
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M5 3l4 4-4 4"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <div class="nge-speed-control">
+                <span class="nge-speed-label">Speed</span>
+                <select id="speedSelect" class="nge-speed-select">
+                  <option value="1600">Slow</option>
+                  <option value="1100" selected>Normal</option>
+                  <option value="600">Fast</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="nge-progress">
+              <span class="nge-progress-text">
+                Step <span id="stepCount">0</span> of <span id="totalSteps">0</span>
+              </span>
+              <div class="nge-progress-bar">
+                <div class="nge-progress-fill" id="progressFill"></div>
+              </div>
+            </div>
+          </div>
+
           <section class="mh-panel nge-info" style="margin-top: 20px;">
             <div class="mh-panel-title">How It Works</div>
             <div class="nge-info-body">
@@ -142,57 +193,6 @@
 
             <div class="nge-label">Answer Array</div>
             <div class="nge-array-row" id="answerRow"></div>
-
-            <div class="nge-controls">
-              <div class="nge-controls-row">
-                <button class="btn-primary" id="playBtn">
-                  <span id="playIcon">▶</span>
-                  <span id="playText">Play</span>
-                </button>
-                <button class="btn-step nge-btn-secondary" id="prevBtn">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path
-                      d="M9 11L5 7l4-4"
-                      stroke="currentColor"
-                      stroke-width="1.75"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  Prev
-                </button>
-                <button class="btn-step nge-btn-secondary" id="nextBtn">
-                  Next
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path
-                      d="M5 3l4 4-4 4"
-                      stroke="currentColor"
-                      stroke-width="1.75"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                </button>
-
-                <div class="nge-speed-control">
-                  <span class="nge-speed-label">Speed</span>
-                  <select id="speedSelect" class="nge-speed-select">
-                    <option value="1600">Slow</option>
-                    <option value="1100" selected>Normal</option>
-                    <option value="600">Fast</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="nge-progress">
-                <span class="nge-progress-text">
-                  Step <span id="stepCount">0</span> of <span id="totalSteps">0</span>
-                </span>
-                <div class="nge-progress-bar">
-                  <div class="nge-progress-fill" id="progressFill"></div>
-                </div>
-              </div>
-            </div>
 
             <div class="nge-explanation-box" id="explanation">
               <strong>Current Step Explanation:</strong><br />

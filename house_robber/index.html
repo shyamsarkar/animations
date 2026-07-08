@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>House Robber · AlgoVis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <div class="mh-layout">
+    <header class="mh-header">
+      <div class="mh-header-inner">
+        <a href="../index.html" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Back
+        </a>
+        <span class="mh-header-title">House Robber Visualizer</span>
+      </div>
+    </header>
+
+    <main class="mh-main hr-main">
+      <section class="hr-left">
+        <h1 class="mh-page-title">House Robber</h1>
+        <p class="mh-page-sub">Maximize robbed loot from a street of houses without triggering alarms at adjacent ones.
+        </p>
+
+        <div class="mh-input-section">
+          <span class="mh-input-label">House Loot Values</span>
+          <input type="text" id="arrayInput" class="mh-input" placeholder="e.g. 2, 7, 9, 3, 1" value="[2, 7, 9, 3, 1]"
+            spellcheck="false" />
+          <div id="errorText" class="error-text" style="color: var(--error); font-size: 12px; margin-top: 4px;"></div>
+        </div>
+
+        <!-- Visualizer controls -->
+        <div class="hr-controls" style="margin-top: 10px;">
+          <button class="btn-primary" id="playBtn">
+            <span id="playIcon">▶</span>
+            <span id="playText">Play</span>
+          </button>
+          <button class="btn-step hr-btn-secondary" id="prevBtn" disabled>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            Previous
+          </button>
+          <button class="btn-step hr-btn-secondary" id="nextBtn">
+            Next
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="btn-step hr-btn-secondary" id="resetBtn">Reset</button>
+
+          <div class="hr-speed-control">
+            <span class="hr-speed-label">Speed</span>
+            <select id="speedSelect" class="hr-speed-select">
+              <option value="1500">Slow</option>
+              <option value="1000" selected>Normal</option>
+              <option value="500">Fast</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="hr-progress" style="margin-top: 10px; margin-bottom: 10px;">
+          <span class="hr-progress-text">
+            Step <span id="stepCount">0</span> of <span id="totalSteps">0</span>
+          </span>
+          <div class="hr-progress-bar">
+            <div class="hr-progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <section class="mh-panel hr-info">
+          <div class="mh-panel-title">Your Algorithm (Parity DP)</div>
+          <div class="hr-info-body">
+            <p class="hr-intro">
+              This visualizer demonstrates your space-optimized <code>O(1)</code> space Ruby solution. By utilizing
+              parity variables (<code>even</code> and <code>odd</code>), it tracks the maximum robbery sums dynamically.
+            </p>
+
+            <div class="hr-insight">
+              <div class="hr-insight-title">Why it works</div>
+              <p class="hr-insight-text">
+                At any even index <code>i</code>, <code>even + num</code> represents robbing the current house and
+                adding it to the maximum looted up to house <code>i-2</code>. <code>odd</code> represents the max loot
+                up to house <code>i-1</code>. Selecting the maximum updates our running even-parity state.
+              </p>
+            </div>
+
+            <div class="hr-complexity">
+              <h3>Complexity</h3>
+              <p><strong>Time:</strong> O(n) — single pass through the house array.</p>
+              <p><strong>Space:</strong> O(1) — only tracking two variables (<code>even</code>, <code>odd</code>).</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="mh-vis-area">
+        <div class="mh-panel">
+          <div class="mh-panel-title">Visualization</div>
+
+          <!-- Houses row -->
+          <div class="hr-houses-container" id="housesDisplay"></div>
+
+          <!-- Parity values display grid -->
+          <div class="hr-vars-grid">
+            <div class="hr-var-card" id="evenCard">
+              <div class="hr-var-label">
+                Even Parity Sum (even)
+                <span class="hr-var-badge hr-var-badge--even">Active</span>
+              </div>
+              <div class="hr-var-value"><span id="evenVal">0</span></div>
+              <div class="hr-var-path" id="evenPath">Path: []</div>
+            </div>
+
+            <div class="hr-var-card" id="oddCard">
+              <div class="hr-var-label">
+                Odd Parity Sum (odd)
+                <span class="hr-var-badge hr-var-badge--odd">Active</span>
+              </div>
+              <div class="hr-var-value"><span id="oddVal">0</span></div>
+              <div class="hr-var-path" id="oddPath">Path: []</div>
+            </div>
+          </div>
+
+          <!-- Decision Calculation Bubble -->
+          <div class="hr-decision-box" id="decisionBox">
+            <div class="hr-decision-title">Choice Comparison (Max Decision)</div>
+            <div class="hr-decision-flex">
+              <div class="hr-decision-option" id="robOption">
+                <div class="option-label">Rob Option</div>
+                <div class="option-formula" id="robFormula">even + num</div>
+                <div class="option-value"><span id="robVal">0</span></div>
+              </div>
+              <div class="hr-decision-vs" id="decisionVs">vs</div>
+              <div class="hr-decision-option" id="skipOption">
+                <div class="option-label">Skip Option</div>
+                <div class="option-formula" id="skipFormula">odd</div>
+                <div class="option-value"><span id="skipVal">0</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explanation box -->
+          <div class="hr-explanation-box" id="explanation"></div>
+
+          <!-- Final Result Box -->
+          <div class="hr-result-box" id="resultBox">
+            <div class="hr-result-label">Result</div>
+            <div class="hr-result-text">
+              Maximum money robbed is
+              <span class="hr-result-highlight" id="resultSum">0</span><br />
+              Robbed houses: <span class="hr-result-array" id="resultPath">[]</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+
+</html>

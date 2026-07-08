@@ -1,0 +1,526 @@
+/* House Robber visualizer styles on top of the shared dark theme in css/style.css */
+
+.hr-main {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  grid-template-rows: auto auto;
+  gap: 24px;
+}
+
+.hr-left {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hr-info {
+  margin-top: 8px;
+}
+
+.hr-info-body {
+  font-size: 14px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hr-intro {
+  line-height: 1.6;
+}
+
+.hr-insight {
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.hr-insight-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.hr-insight-text {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.hr-steps h3,
+.hr-complexity h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.hr-steps ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hr-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.hr-steps .step-number {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hr-steps .step-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.hr-complexity p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.hr-complexity strong {
+  color: var(--text-primary);
+}
+
+/* Visualization Panel */
+
+.hr-houses-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background-color: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  min-height: 140px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.house-card {
+  position: relative;
+  width: 70px;
+  height: 90px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  cursor: default;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.house-index {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.house-icon-wrapper {
+  margin: 4px 0;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.house-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* House States */
+.house-card.current {
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  transform: translateY(-8px);
+}
+
+.house-card.current .house-icon-wrapper {
+  color: var(--accent);
+  transform: scale(1.15);
+}
+
+.house-card.robbed {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: var(--success);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+.house-card.robbed .house-icon-wrapper {
+  color: var(--success);
+}
+
+.house-card.robbed .house-value {
+  color: var(--success);
+}
+
+.house-card.skipped {
+  opacity: 0.4;
+  border-style: dashed;
+}
+
+.house-card.skipped .house-icon-wrapper {
+  color: var(--text-muted);
+}
+
+/* Variable display cards */
+
+.hr-vars-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.hr-var-card {
+  background-color: var(--bg-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 14px;
+  transition: all 0.3s ease;
+}
+
+.hr-var-card.active-even {
+  border-color: rgba(59, 130, 246, 0.8);
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.2), transparent);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+}
+
+.hr-var-card.active-odd {
+  border-color: rgba(168, 85, 247, 0.8); /* purple for odd */
+  background: radial-gradient(circle at top left, rgba(168, 85, 247, 0.2), transparent);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);
+}
+
+.hr-var-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hr-var-badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-weight: 700;
+  display: none;
+}
+
+.hr-var-card.active-even .hr-var-badge--even,
+.hr-var-card.active-odd .hr-var-badge--odd {
+  display: inline-block;
+}
+
+.hr-var-badge--even {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: var(--accent);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.hr-var-badge--odd {
+  background-color: rgba(168, 85, 247, 0.2);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.hr-var-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+}
+
+.hr-var-path {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+/* Comparison calculation bubble */
+
+.hr-decision-box {
+  background-color: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.hr-decision-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.hr-decision-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hr-decision-option {
+  flex: 1;
+  background-color: var(--bg-surface-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.hr-decision-option.chosen {
+  border-color: var(--success);
+  background-color: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+}
+
+.hr-decision-option.chosen .option-value {
+  color: var(--success);
+}
+
+.option-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.option-formula {
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.option-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.hr-decision-vs {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+/* Explanation */
+
+.hr-explanation-box {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface-2);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.hr-explanation-box strong {
+  color: var(--text-primary);
+}
+
+/* Controls */
+
+.hr-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.hr-btn-secondary {
+  background-color: var(--bg-surface-2);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.hr-btn-secondary:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.hr-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hr-speed-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.hr-speed-select {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface-2);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.hr-speed-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Progress bar */
+
+.hr-progress {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hr-progress-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.hr-progress-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background-color: var(--bg-surface-2);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.hr-progress-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), #10b981);
+  transition: width 0.3s ease;
+}
+
+/* Results section */
+
+.hr-result-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(16, 185, 129, 0.7);
+  background: rgba(16, 185, 129, 0.14);
+  display: none;
+}
+
+.hr-result-box.show {
+  display: block;
+  animation: slide-up 0.4s ease-out;
+}
+
+.hr-result-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--success);
+  margin-bottom: 4px;
+}
+
+.hr-result-text {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.hr-result-highlight {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.hr-result-array {
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hr-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .hr-left {
+    grid-row: 1;
+  }
+
+  .mh-vis-area {
+    grid-row: 2;
+  }
+
+  .hr-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hr-controls > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hr-speed-control {
+    margin-left: 0;
+    justify-content: space-between;
+  }
+}

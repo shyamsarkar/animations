@@ -13,7 +13,8 @@ class KadaneVisualizer {
   initializeEventListeners() {
     document.getElementById('arrayInput').addEventListener('change', (e) => this.handleArrayChange(e.target.value));
     document.getElementById('playBtn').addEventListener('click', () => this.togglePlay());
-    document.getElementById('nextBtn').addEventListener('click', () => this.nextStep());
+    document.getElementById('prevBtn').addEventListener('click', () => { this.pause(); this.prevStep(); });
+    document.getElementById('nextBtn').addEventListener('click', () => { this.pause(); this.nextStep(); });
     document.getElementById('resetBtn').addEventListener('click', () => this.reset());
     document.getElementById('speedSelect').addEventListener('change', (e) => {
       this.speed = Number(e.target.value);
@@ -156,8 +157,17 @@ class KadaneVisualizer {
       resultBox.classList.remove('show');
     }
 
+    const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
+    prevBtn.disabled = this.currentStep === 0;
     nextBtn.disabled = this.currentStep >= this.steps.length - 1;
+  }
+
+  prevStep() {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+      this.updateDisplay();
+    }
   }
 
   nextStep() {

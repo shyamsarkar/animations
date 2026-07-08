@@ -63,6 +63,16 @@
 
             <div class="mh-controls">
                 <div class="mh-controls-row">
+                    <button class="btn-step" id="prevStepBtn" disabled>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Previous Step
+                    </button>
+                    <div class="step-progress">
+                        <div class="step-progress-bar" id="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <span class="step-counter" id="step-counter">Step 0 / 0</span>
                     <button class="btn-step" id="nextStepBtn" disabled>
                         Next Step
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -106,24 +116,27 @@
         class MaxHeapVisualizer {
             constructor() {
                 this.heap = [];
-                this.animationQueue = [];
-                this.isAnimating = false;
+                this.steps = [];
                 this.currentStep = 0;
                 this.treeContainer = document.getElementById('tree-container');
                 this.arrayContainer = document.getElementById('array-container');
                 this.statusEl = document.getElementById('status');
+                this.prevStepBtn = document.getElementById('prevStepBtn');
                 this.nextStepBtn = document.getElementById('nextStepBtn');
                 this.messageDot = document.getElementById('message-dot');
+                this.progressBar = document.getElementById('progress-bar');
+                this.stepCounter = document.getElementById('step-counter');
 
                 this.setupEventListeners();
-                this.render();
+                this.renderStep();
             }
 
             setupEventListeners() {
                 document.getElementById('insertBtn').addEventListener('click', () => this.insertValue());
                 document.getElementById('extractBtn').addEventListener('click', () => this.extractRoot());
                 document.getElementById('clearBtn').addEventListener('click', () => this.clear());
-                document.getElementById('nextStepBtn').addEventListener('click', () => this.executeNextStep());
+                this.nextStepBtn.addEventListener('click', () => this.goNext());
+                this.prevStepBtn.addEventListener('click', () => this.goPrev());
 
                 document.getElementById('valueInput').addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.insertValue();
@@ -131,8 +144,6 @@
             }
 
             insertValue() {
-                if (this.isAnimating) return;
-
                 const input = document.getElementById('valueInput');
                 const value = parseInt(input.value);
 
@@ -141,84 +152,144 @@
                     return;
                 }
 
+                const stepList = [];
+                stepList.push({
+                    array: [...this.heap, value],
+                    highlighted: [],
+                    swapping: [],
+                    type: 'initial',
+                    message: `Inserting ${value} at the end of the heap.`
+                });
+
                 this.heap.push(value);
-                this.animationQueue = [];
-                this.bubbleUp(this.heap.length - 1);
-                this.startAnimation();
+                this.bubbleUp(this.heap.length - 1, stepList);
+
+                stepList.push({
+                    array: [...this.heap],
+                    highlighted: [],
+                    swapping: [],
+                    type: 'complete',
+                    message: `Insert complete. Heap property satisfied.`
+                });
+
+                this.steps = stepList;
+                this.currentStep = 0;
+                this.renderStep();
 
                 input.value = '';
                 input.focus();
             }
 
             extractRoot() {
-                if (this.isAnimating || this.heap.length === 0) return;
+                if (this.heap.length === 0) return;
 
-                this.animationQueue = [];
+                const stepList = [];
 
                 if (this.heap.length === 1) {
-                    this.animationQueue.push({
+                    const popped = this.heap[0];
+                    stepList.push({
+                        array: [...this.heap],
+                        highlighted: [0],
+                        swapping: [],
+                        type: 'compare',
+                        message: `Extracting root: ${popped}. Heap will become empty.`
+                    });
+                    this.heap = [];
+                    stepList.push({
                         array: [],
                         highlighted: [],
                         swapping: [],
                         type: 'complete',
-                        message: 'Root extracted. Heap is now empty.'
+                        message: 'Heap is now empty.'
                     });
-                    this.heap = [];
-                    this.startAnimation();
+                    this.steps = stepList;
+                    this.currentStep = 0;
+                    this.renderStep();
                     return;
                 }
 
-                this.animationQueue.push({
+                const rootVal = this.heap[0];
+                const lastVal = this.heap[this.heap.length - 1];
+
+                stepList.push({
                     array: [...this.heap],
-                    highlighted: [0],
+                    highlighted: [0, this.heap.length - 1],
                     swapping: [],
                     type: 'compare',
-                    message: `Extracting root: ${this.heap[0]}. Moving last element to root.`
+                    message: `Extracting root: ${rootVal}. Replacing root with last element ${lastVal}.`
                 });
 
                 this.heap[0] = this.heap.pop();
-                this.bubbleDown(0);
-                this.startAnimation();
+                
+                stepList.push({
+                    array: [...this.heap],
+                    highlighted: [0],
+                    swapping: [],
+                    type: 'swapped',
+                    message: `Last element moved to root. Now heapifying down from root.`
+                });
+
+                this.bubbleDown(0, stepList);
+
+                stepList.push({
+                    array: [...this.heap],
+                    highlighted: [],
+                    swapping: [],
+                    type: 'complete',
+                    message: `Extract complete.`
+                });
+
+                this.steps = stepList;
+                this.currentStep = 0;
+                this.renderStep();
             }
 
-            bubbleUp(index) {
+            bubbleUp(index, stepList) {
                 if (index === 0) return;
 
                 const parentIndex = Math.floor((index - 1) / 2);
                 const shouldSwap = this.heap[index] > this.heap[parentIndex];
 
-                if (shouldSwap) {
-                    this.animationQueue.push({
-                        array: [...this.heap],
-                        highlighted: [index, parentIndex],
-                        swapping: [],
-                        type: 'compare',
-                        message: `Comparing ${this.heap[index]} with parent ${this.heap[parentIndex]}. Child is larger, will swap.`
-                    });
+                stepList.push({
+                    array: [...this.heap],
+                    highlighted: [index, parentIndex],
+                    swapping: [],
+                    type: 'compare',
+                    message: `Comparing node [${index}]=${this.heap[index]} with parent [${parentIndex}]=${this.heap[parentIndex]}.`
+                });
 
-                    this.animationQueue.push({
+                if (shouldSwap) {
+                    stepList.push({
                         array: [...this.heap],
                         highlighted: [index, parentIndex],
                         swapping: [index, parentIndex],
                         type: 'swap',
-                        message: `Swapping ${this.heap[index]} and ${this.heap[parentIndex]}...`
+                        message: `Swap needed: ${this.heap[index]} > ${this.heap[parentIndex]}. Swapping index ${index} with index ${parentIndex}.`
                     });
 
                     [this.heap[index], this.heap[parentIndex]] = [this.heap[parentIndex], this.heap[index]];
 
-                    this.bubbleUp(parentIndex);
+                    stepList.push({
+                        array: [...this.heap],
+                        highlighted: [index, parentIndex],
+                        swapping: [],
+                        type: 'swapped',
+                        message: `Swapped! Index ${parentIndex} is now ${this.heap[parentIndex]}, index ${index} is now ${this.heap[index]}.`
+                    });
+
+                    this.bubbleUp(parentIndex, stepList);
                 } else {
-                    this.animationQueue.push({
+                    stepList.push({
                         array: [...this.heap],
                         highlighted: [index],
                         swapping: [],
                         type: 'no-swap',
-                        message: `No swap needed. ${this.heap[index]} is in correct position.`
+                        message: `No swap needed. Parent is larger or equal.`
                     });
                 }
             }
 
-            bubbleDown(index) {
+            bubbleDown(index, stepList) {
                 const leftChild = 2 * index + 1;
                 const rightChild = 2 * index + 2;
                 let targetIndex = index;
@@ -227,12 +298,12 @@
                     const compareNodes = [index, leftChild];
                     if (rightChild < this.heap.length) compareNodes.push(rightChild);
 
-                    this.animationQueue.push({
+                    stepList.push({
                         array: [...this.heap],
                         highlighted: compareNodes,
                         swapping: [],
                         type: 'compare',
-                        message: `Comparing ${this.heap[index]} with children.`
+                        message: `Comparing node [${index}]=${this.heap[index]} with children.`
                     });
 
                     if (this.heap[leftChild] > this.heap[targetIndex]) {
@@ -244,7 +315,7 @@
                     }
 
                     if (targetIndex !== index) {
-                        this.animationQueue.push({
+                        stepList.push({
                             array: [...this.heap],
                             highlighted: [index, targetIndex],
                             swapping: [index, targetIndex],
@@ -253,52 +324,73 @@
                         });
 
                         [this.heap[index], this.heap[targetIndex]] = [this.heap[targetIndex], this.heap[index]];
-                        this.bubbleDown(targetIndex);
+
+                        stepList.push({
+                            array: [...this.heap],
+                            highlighted: [index, targetIndex],
+                            swapping: [],
+                            type: 'swapped',
+                            message: `Swapped index ${index} with index ${targetIndex}.`
+                        });
+
+                        this.bubbleDown(targetIndex, stepList);
                     } else {
-                        this.animationQueue.push({
+                        stepList.push({
                             array: [...this.heap],
                             highlighted: [index],
                             swapping: [],
                             type: 'no-swap',
-                            message: 'Heap property satisfied!'
+                            message: `Heap property satisfied.`
                         });
                     }
                 } else {
-                    this.animationQueue.push({
+                    stepList.push({
                         array: [...this.heap],
                         highlighted: [index],
                         swapping: [],
                         type: 'no-swap',
-                        message: 'Heap property satisfied!'
+                        message: `Heap property satisfied.`
                     });
                 }
             }
 
-            startAnimation() {
-                if (this.animationQueue.length === 0) {
-                    this.render();
-                    return;
+            goNext() {
+                if (this.currentStep < this.steps.length - 1) {
+                    this.currentStep++;
+                    this.renderStep();
                 }
-
-                this.isAnimating = true;
-                this.nextStepBtn.disabled = false;
-                this.executeNextStep();
             }
 
-            executeNextStep() {
-                if (this.animationQueue.length === 0) {
-                    this.isAnimating = false;
+            goPrev() {
+                if (this.currentStep > 0) {
+                    this.currentStep--;
+                    this.renderStep();
+                }
+            }
+
+            renderStep() {
+                if (this.steps.length === 0) {
+                    this.render([], [], [], '');
+                    this.setStatus('Heap is empty.');
+                    this.updateMessageDot('');
+                    this.stepCounter.textContent = 'Step 0 / 0';
+                    this.progressBar.style.width = '0%';
+                    this.prevStepBtn.disabled = true;
                     this.nextStepBtn.disabled = true;
-                    this.setStatus('Animation complete! Ready for next operation.');
-                    this.updateMessageDot('complete');
-                    this.render();
                     return;
                 }
 
-                const step = this.animationQueue.shift();
+                const step = this.steps[this.currentStep];
                 this.setStatus(step.message);
                 this.updateMessageDot(step.type);
-                this.render(step.array || this.heap, step.highlighted || [], step.swapping || [], step.type);
+                this.render(step.array, step.highlighted, step.swapping, step.type);
+
+                const total = this.steps.length - 1;
+                this.stepCounter.textContent = `Step ${this.currentStep} / ${total}`;
+                this.progressBar.style.width = total > 0 ? `${(this.currentStep / total) * 100}%` : '0%';
+
+                this.prevStepBtn.disabled = this.currentStep === 0;
+                this.nextStepBtn.disabled = this.currentStep === total;
             }
 
             updateMessageDot(type) {
@@ -313,10 +405,10 @@
             }
 
             clear() {
-                if (this.isAnimating) return;
                 this.heap = [];
-                this.animationQueue = [];
-                this.render();
+                this.steps = [];
+                this.currentStep = 0;
+                this.renderStep();
                 this.setStatus('Heap cleared. Ready for new operations.');
             }
 
