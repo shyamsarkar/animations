@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subarray Sum Equals K · AlgoVis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <div class="mh-layout">
+    <header class="mh-header">
+      <div class="mh-header-inner">
+        <a href="../index.html" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Back
+        </a>
+        <span class="mh-header-title">Subarray Sum Equals K Visualizer</span>
+      </div>
+    </header>
+
+    <main class="mh-main sub-main">
+      <section class="sub-left">
+        <h1 class="mh-page-title">Subarray Sum = k</h1>
+        <p class="mh-page-sub">Find the number of continuous subarrays whose sum equals to k in linear time.</p>
+
+        <div class="sub-inputs">
+          <div class="mh-input-section">
+            <span class="mh-input-label">Array (nums)</span>
+            <input type="text" id="arrayInput" class="mh-input" placeholder="e.g. 1, 2, 3, -3, 1, 1, 1"
+              value="[1, 2, 3, -3, 1, 1, 1, 4, 2, -2]" spellcheck="false" />
+          </div>
+          <div class="mh-input-section" style="margin-top: 12px;">
+            <span class="mh-input-label">Target Sum (k)</span>
+            <input type="number" id="kInput" class="mh-input" value="3" spellcheck="false" />
+          </div>
+        </div>
+
+        <div class="sub-controls" style="margin-top: 16px;">
+          <button class="btn-primary" id="playBtn">
+            <span id="playIcon">▶</span>
+            <span id="playText">Play</span>
+          </button>
+          <button class="btn-step sub-btn-secondary" id="prevBtn" disabled>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            Previous
+          </button>
+          <button class="btn-step sub-btn-secondary" id="nextBtn">
+            Next
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button class="btn-step sub-btn-secondary" id="resetBtn">Reset</button>
+
+          <div class="sub-speed-control">
+            <span class="sub-speed-label">Speed</span>
+            <select id="speedSelect" class="sub-speed-select">
+              <option value="1800">Slow</option>
+              <option value="1100" selected>Normal</option>
+              <option value="500">Fast</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sub-progress" style="margin-top: 16px; margin-bottom: 16px;">
+          <span class="sub-progress-text">
+            Step <span id="stepCount">1</span> of <span id="totalSteps">1</span>
+          </span>
+          <div class="sub-progress-bar">
+            <div class="sub-progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <section class="mh-panel sub-info">
+          <div class="mh-panel-title">How It Works</div>
+          <div class="sub-info-body">
+            <p class="sub-intro">
+              This algorithm finds the count of subarrays summing to <code>k</code> in O(n) time and O(n) space.
+            </p>
+
+            <div class="sub-insight">
+              <div class="sub-insight-title">Key Insight</div>
+              <p class="sub-insight-text">
+                Let the prefix sum ending at index <code>i</code> be <code>prefix_sum</code>.
+                If there exists an index <code>j</code> (where <code>j &lt; i</code>) with a prefix sum equal to <code>prefix_sum - k</code>,
+                then the subarray from <code>j + 1</code> to <code>i</code> must sum exactly to <code>k</code>. We use a frequency ledger (hash map) to remember how many times we've seen each prefix sum in the past.
+              </p>
+            </div>
+
+            <div class="sub-steps">
+              <h3>Algorithm Steps</h3>
+              <ol>
+                <li>
+                  <span class="step-number">1</span>
+                  <span class="step-text">Initialize <code>prefix_sum = 0</code>, <code>count = 0</code>, and <code>prefix_count = { 0: 1 }</code> (empty prefix).</span>
+                </li>
+                <li>
+                  <span class="step-number">2</span>
+                  <span class="step-text">For each number, add it to <code>prefix_sum</code>.</span>
+                </li>
+                <li>
+                  <span class="step-number">3</span>
+                  <span class="step-text">Check the ledger: if <code>prefix_sum - k</code> is present, add its frequency to our total <code>count</code>.</span>
+                </li>
+                <li>
+                  <span class="step-number">4</span>
+                  <span class="step-text">Increment the frequency of <code>prefix_sum</code> in the ledger by 1.</span>
+                </li>
+              </ol>
+            </div>
+
+            <div class="sub-complexity">
+              <h3>Complexity</h3>
+              <p><strong>Time:</strong> O(n) — single pass over the array.</p>
+              <p><strong>Space:</strong> O(n) — to store prefix sum frequencies in the ledger.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="mh-vis-area">
+        <div class="mh-panel">
+          <div class="mh-panel-title">Visualization</div>
+
+          <div class="mh-array-container sub-array-container" id="arrayDisplay"></div>
+
+          <div class="sub-stats-grid">
+            <div class="sub-stat-card">
+              <div class="sub-stat-label">Current Index</div>
+              <div class="sub-stat-value" id="currentIndex">0</div>
+            </div>
+            <div class="sub-stat-card sub-stat-card--teal">
+              <div class="sub-stat-label">Running Sum</div>
+              <div class="sub-stat-value" id="prefixSum">0</div>
+            </div>
+            <div class="sub-stat-card sub-stat-card--purple">
+              <div class="sub-stat-label">Looking for (sum - k)</div>
+              <div class="sub-stat-value" id="targetSum">—</div>
+            </div>
+            <div class="sub-stat-card sub-stat-card--green">
+              <div class="sub-stat-label">Subarrays Found</div>
+              <div class="sub-stat-value" id="matchCount">0</div>
+            </div>
+          </div>
+
+          <div class="sub-explanation-box" id="explanation"></div>
+
+          <div class="sub-ledger-panel">
+            <div class="sub-ledger-header">
+              <span class="sub-ledger-title">Prefix Sum Ledger</span>
+              <span class="sub-ledger-subtitle">prefix_count[sum] → frequency</span>
+            </div>
+            <table class="sub-ledger-table">
+              <thead>
+                <tr>
+                  <th>Prefix Sum</th>
+                  <th>Frequency</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerBody">
+                <!-- Ledger items populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+
+</html>
