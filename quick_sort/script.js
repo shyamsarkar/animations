@@ -303,4 +303,4 @@ class QuicksortVisualizer {
   }
 }
 
-export default QuicksortVisualizer;
+document.addEventListener("DOMContentLoaded", () => { new QuicksortVisualizer(); });

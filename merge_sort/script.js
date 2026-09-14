@@ -265,4 +265,4 @@ class MergesortVisualizer {
   }
 }
 
-export default MergesortVisualizer;
+document.addEventListener("DOMContentLoaded", () => { new MergesortVisualizer(); });

@@ -1,0 +1,20 @@
+{
+  "name": "animations",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive algorithm and data structure visualizers in vanilla JavaScript",
+  "scripts": {
+    "dev": "python3 -m http.server 5173",
+    "start": "python3 -m http.server 5173",
+    "serve": "npx -y serve ."
+  },
+  "keywords": [
+    "algorithm",
+    "data-structures",
+    "visualizer",
+    "vanilla-js",
+    "animations"
+  ],
+  "author": "Shyam Sarkar",
+  "license": "MIT"
+}
